@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Music Recommender</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+<div class="app-layout">
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">🎵 Bzets Music</div>
+        <form id="download-form" class="search-bar">
+            <input type="text" id="searchQuery" name="query" placeholder="Search & Download Music...">
+            <button type="submit" id="downloadBtn">
+                <span class="btn-text">Download</span>
+                <span class="btn-loading" style="display: none;">
+                    <span class="spinner-dot"></span>
+                    <span class="spinner-dot"></span>
+                    <span class="spinner-dot"></span>
+                </span>
+            </button>
+        </form>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Song Library -->
+        <aside class="song-library">
+            <div class="song-library-header">
+                <h2>🎧 Your Library</h2>
+                <div class="song-count">{{ song_files|length }} songs</div>
+            </div>
+            <ul class="song-list">
+                {% for song in song_files %}
+                <li class="song-item" data-filename="{{ song.name|e }}" data-album-art="{{ song.album_art }}">
+                    <div class="song-item-inner">
+                        <div class="song-thumbnail">
+                            <img src="{{ song.album_art }}" alt="Album Art">
+                        </div>
+                        <div class="song-details">
+                            <div class="song-name">{{ song.name|replace('.mp3', '')|replace('.wav', '')|replace('.flac', '') }}</div>
+                            <div class="song-format">{{ song.name.split('.')[-1].upper() }}</div>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </aside>
+
+        <!-- Player & Action Panel -->
+        <section class="player-section opacity-0 translate-y-4">
+            <!-- Spotify-like Player -->
+            <div class="spotify-player">
+                <div class="player-album-art">
+                    <img id="currentAlbumArt" src="/static/images/album-art/gray.svg" alt="Album Art">
+                </div>
+                <div class="player-content">
+                    <div class="player-info">
+                        <h3 id="nowPlaying">Select a song to play</h3>
+                        <p id="playerSubtitle" class="player-subtitle">Bzets Music</p>
+                    </div>
+                    
+                    <div class="player-controls">
+                        <button class="control-button" id="prevButton" disabled>
+                            <i class="fas fa-step-backward"></i>
+                        </button>
+                        <button class="control-button control-main" id="playPauseButton" disabled>
+                            <i class="fas fa-play" id="playPauseIcon"></i>
+                        </button>
+                        <button class="control-button" id="nextButton" disabled>
+                            <i class="fas fa-step-forward"></i>
+                        </button>
+                        <!-- Minimalistic 5-Bar Equalizer Visualizer -->
+                        <div class="visualizer-container">
+                            <div class="equalizer-visualizer" id="equalizerVisualizer">
+                                <div class="equalizer-bar"></div>
+                                <div class="equalizer-bar"></div>
+                                <div class="equalizer-bar"></div>
+                                <div class="equalizer-bar"></div>
+                                <div class="equalizer-bar"></div>
+                            </div>
+                            <canvas id="visualizer"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="player-progress">
+                        <span id="currentTime" class="time">0:00</span>
+                        <div class="progress-bar">
+                            <div class="progress-bar-fill" id="progressBarFill"></div>
+                        </div>
+                        <span id="duration" class="time">0:00</span>
+                    </div>
+                    
+                    <audio id="audioPlayer" style="display: none;">
+                        <source id="audioSource" src="" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            </div>
+            
+            <div class="action-panel">
+                <form id="analyze-form" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="filename" id="selectedFile">
+                    <button type="submit" class="analyze-btn">
+                        <i class="fas fa-chart-bar"></i>
+                        Analyze Song
+                    </button>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+    <!-- Loader -->
+    <div class="loading-overlay" id="loadingOverlay" style="display:none;">
+        <div class="loading-spinner"></div>
+    </div>
+</div>
+<script>
+// Song selection and playback
+let audioPlayer = document.getElementById("audioPlayer");
+let playPauseButton = document.getElementById("playPauseButton");
+let playPauseIcon = document.getElementById("playPauseIcon");
+let progressBarFill = document.getElementById("progressBarFill");
+let currentTimeDisplay = document.getElementById("currentTime");
+let durationDisplay = document.getElementById("duration");
+let prevButton = document.getElementById("prevButton");
+let nextButton = document.getElementById("nextButton");
+let currentSongIndex = -1;
+let songItems = document.querySelectorAll(".song-item");
+
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+}
+
+function updateProgressBar() {
+    if (audioPlayer.duration) {
+        const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+        progressBarFill.style.width = `${progress}%`;
+        currentTimeDisplay.textContent = formatTime(audioPlayer.currentTime);
+        durationDisplay.textContent = formatTime(audioPlayer.duration);
+    }
+}
+
+function setNowPlaying(name, albumArt) {
+    document.getElementById("nowPlaying").textContent = name.replace('.mp3', '').replace('.wav', '').replace('.flac', '');
+    document.getElementById("playerSubtitle").textContent = name.split('.').pop().toUpperCase();
+    document.getElementById("currentAlbumArt").src = albumArt;
+    
+    // Enable control buttons
+    playPauseButton.disabled = false;
+    
+    // Enable prev/next buttons if there are multiple songs
+    if (songItems.length > 1) {
+        prevButton.disabled = false;
+        nextButton.disabled = false;
+    }
+}
+
+function playSong(index) {
+    if (index < 0 || index >= songItems.length) return;
+    
+    currentSongIndex = index;
+    const item = songItems[index];
+    const filename = item.getAttribute("data-filename");
+    const albumArt = item.getAttribute("data-album-art");
+    
+    audioPlayer.src = `/uploads/${encodeURIComponent(filename)}`;
+    audioPlayer.load();
+    audioPlayer.play();
+    document.getElementById("selectedFile").value = filename;
+    setNowPlaying(filename, albumArt);
+    
+    // Update play/pause icon
+    playPauseIcon.className = "fas fa-pause";
+    
+    // Update active song in list
+    document.querySelectorAll('.song-item').forEach(el => el.classList.remove('active'));
+    item.classList.add('active');
+}
+
+// Attach click listeners to songs
+songItems.forEach((item, index) => {
+    item.addEventListener("click", () => {
+        playSong(index);
+    });
+});
+
+// Play/Pause button
+playPauseButton.addEventListener("click", () => {
+    if (audioPlayer.paused) {
+        audioPlayer.play();
+        playPauseIcon.className = "fas fa-pause";
+    } else {
+        audioPlayer.pause();
+        playPauseIcon.className = "fas fa-play";
+    }
+});
+
+// Previous button
+prevButton.addEventListener("click", () => {
+    if (currentSongIndex > 0) {
+        playSong(currentSongIndex - 1);
+    } else {
+        // Wrap around to the last song
+        playSong(songItems.length - 1);
+    }
+});
+
+// Next button
+nextButton.addEventListener("click", () => {
+    if (currentSongIndex < songItems.length - 1) {
+        playSong(currentSongIndex + 1);
+    } else {
+        // Wrap around to the first song
+        playSong(0);
+    }
+});
+
+// Update progress bar as audio plays
+audioPlayer.addEventListener("timeupdate", updateProgressBar);
+
+// When audio ends, play next song
+audioPlayer.addEventListener("ended", () => {
+    if (currentSongIndex < songItems.length - 1) {
+        playSong(currentSongIndex + 1);
+    } else {
+        // Reset to first song or stop
+        playPauseIcon.className = "fas fa-play";
+    }
+});
+
+// Click on progress bar to seek
+document.querySelector(".progress-bar").addEventListener("click", (e) => {
+    if (!audioPlayer.src) return;
+    
+    const progressBar = e.currentTarget;
+    const clickPosition = e.clientX - progressBar.getBoundingClientRect().left;
+    const progressBarWidth = progressBar.offsetWidth;
+    const seekPercentage = clickPosition / progressBarWidth;
+    
+    audioPlayer.currentTime = seekPercentage * audioPlayer.duration;
+});
+
+// Analyze form validation
+document.getElementById("analyze-form").addEventListener("submit", function(e) {
+    if (!document.getElementById("selectedFile").value) {
+        e.preventDefault();
+        showToast("🎵 Please select a song to analyze.", "error");
+    }
+});
+
+// Download form
+document.getElementById("download-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const query = document.getElementById("searchQuery").value;
+    
+    // Show loading indicator in button instead of full screen
+    const downloadBtn = document.getElementById("downloadBtn");
+    const btnText = downloadBtn.querySelector(".btn-text");
+    const btnLoading = downloadBtn.querySelector(".btn-loading");
+    
+    btnText.style.display = "none";
+    btnLoading.style.display = "flex";
+    downloadBtn.disabled = true;
+    
+    fetch("/download", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: query })
+    })
+    .then(res => res.json())
+    .then(data => {
+        // Reset button state
+        btnText.style.display = "block";
+        btnLoading.style.display = "none";
+        downloadBtn.disabled = false;
+        
+        showToast(data.message, "success");
+        window.location.reload();
+    })
+    .catch(err => {
+        // Reset button state
+        btnText.style.display = "block";
+        btnLoading.style.display = "none";
+        downloadBtn.disabled = false;
+        
+        showToast("❌ Error downloading song.", "error");
+    });
+});
+
+// Toast and Loader functions
+function showToast(msg, type) {
+    const toast = document.createElement('div');
+    toast.className = `toast show ${type}`;
+    toast.innerHTML = `<span class='toast-icon'>${type === 'success' ? '✅' : '⚠️'}</span><span class='toast-message'>${msg}</span><button class='toast-close' onclick='this.parentNode.remove()'>×</button>`;
+    document.getElementById('toastContainer').appendChild(toast);
+    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3500);
+}
+
+function showLoader(show) {
+    document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+}
+</script>
+<script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>
