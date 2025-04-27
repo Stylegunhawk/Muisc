@@ -14,27 +14,51 @@
 <div class="app-layout">
     <header class="header">
         <div class="logo">🔍 Analysis Results</div>
-        <a href="/" class="back-btn"><span class="back-icon">⬅</span> <span class="back-text">Back to Main</span></a>
+        <a href="/index" class="back-btn"><span class="back-icon">⬅</span> <span class="back-text">Back to Main</span></a>
     </header>
-    <div class="results-content">
-        <section class="genre-prediction">
-            <h2>🎼 Predicted Genre: <span>{{ genre }}</span></h2>
-            <div class="confidence-scores">
+    <div class="results-content results-grid">
+        <aside class="confidence-grid-col">
+            <div class="confidence-scores fun-confidence">
                 <h3>Confidence Scores:</h3>
                 <ul>
                     {% set class_labels = ["Blues", "Classical", "Country", "Disco", "Hip-Hop", "Jazz", "Metal", "Pop", "Reggae", "Rock"] %}
+                    {% set genre_icons = [
+                        '🎸', '🎻', '🤠', '🕺', '🎤', '🎷', '🤘', '🎹', '🌴', '🥁'
+                    ] %}
+                    {% set genre_colors = [
+                        '#6A4C93', '#FFB86F', '#FF6F61', '#F8E16C', '#2EC4B6', '#3A86FF', '#FF006E', '#8338EC', '#43AA8B', '#FFBE0B'
+                    ] %}
                     {% for i in range(confidence|length) %}
-                        <li>
-                            <div class="score-label">{{ class_labels[i] }}: {{ '%.2f'|format(confidence[i] * 100) }}%</div>
-                            <div class="confidence-bar">
-                                <div class="confidence-fill" style="width: {{ (confidence[i] * 100)|round(0, 'floor') }}%"></div>
-                            </div>
-                        </li>
+                    <li class="confidence-score-item" style="--bar-color: {{ genre_colors[i] }};">
+                        <span class="genre-icon">{{ genre_icons[i] }}</span>
+                        <span class="score-label">{{ class_labels[i] }}</span>
+                        <div class="confidence-bar-outer">
+                            <div class="confidence-bar-animated" style="animation-delay: {{ i * 0.08 }}s; background: var(--bar-color); width: 0%" data-score="{{ (confidence[i] * 100)|round(0, 'floor') }}"></div>
+                            {% if confidence[i] > 0.7 %}
+                                <span class="pulse-note">🎵</span>
+                            {% endif %}
+                        </div>
+                        <span class="score-value">{{ '%.1f'|format(confidence[i]*100) }}%</span>
+                    </li>
                     {% endfor %}
                 </ul>
             </div>
-        </section>
+        </aside>
         <div class="results-details">
+            <section class="genre-prediction">
+    <h2>🎼 Predicted Genre: <span>{{ genre }}</span></h2>
+    <div class="genre-extra">
+        {% if genre_fact %}
+            <div class="genre-icon-large">{{ genre_fact.icon }}</div>
+            <div class="genre-desc">{{ genre_fact.desc }}</div>
+            {% if genre_fact.fact %}<div class="genre-fact"><b>Did you know?</b> {{ genre_fact.fact }}</div>{% endif %}
+            {% if genre_fact.tip %}<div class="genre-tip"><b>Tip:</b> {{ genre_fact.tip }}</div>{% endif %}
+        {% else %}
+            <div class="genre-icon-large">🎵</div>
+            <div class="genre-desc">A unique musical experience!</div>
+        {% endif %}
+    </div>
+</section>
             <section class="features-display">
                 <h3>🎚 Extracted Features</h3>
                 <ul class="feature-list">

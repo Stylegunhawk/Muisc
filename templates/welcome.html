@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bzets Music</title>
+    <title>Urban Beatzs</title>
+    <link rel="icon" type="image/png" href="/static/images/favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -50,7 +51,7 @@
         }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Poppins:wght@300;400;600;700&display=swap');
         
         body {
             font-family: 'Poppins', sans-serif;
@@ -113,88 +114,54 @@
         }
     </style>
 </head>
-<body class="flex items-center justify-center">
-    <!-- Floating music notes -->
-    <div id="notes-container"></div>
-    
-    <!-- Main content -->
-    <div class="z-10 text-center p-8 bg-white bg-opacity-10 backdrop-blur-lg rounded-3xl shadow-2xl max-w-3xl mx-4 animate-fade-in">
-        <div class="flex flex-col items-center">
-            <!-- Logo animation -->
-            <div class="relative mb-6 animate-float">
-                <div class="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-full blur-xl opacity-30 animate-pulse-slow"></div>
-                <div class="relative">
-                    <svg class="w-32 h-32 text-white" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"></path>
-                    </svg>
-                </div>
+<body class="flex items-center justify-center min-h-screen overflow-hidden">
+    <!-- Navigation Bar -->
+    <nav class="fixed top-0 left-0 w-full bg-black bg-opacity-30 backdrop-blur-sm z-50 px-6 py-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="text-white font-bold text-3xl tracking-wide" style="font-family: 'Amatic SC', cursive, sans-serif; letter-spacing: 2px;">
+                <span class="drop-shadow-lg animate-pulse">Urban Beatzs</span>
             </div>
-            
-            <!-- Title with animation -->
-            <h1 class="text-5xl font-bold text-white mb-2 tracking-tight animate-slide-up" style="animation-delay: 0.2s">
-                <span class="bg-clip-text text-transparent bg-gradient-to-r from-white to-accent">Bzets Music</span>
-            </h1>
-            
-            <!-- Subtitle with animation -->
-            <p class="text-xl text-white opacity-80 mb-8 animate-slide-up" style="animation-delay: 0.4s">
-                Discover, Analyze, and Enjoy Your Music
-            </p>
-            
-            <!-- Features with animations -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                <div class="bg-white bg-opacity-20 p-5 rounded-xl animate-scale-in" style="animation-delay: 0.6s">
-                    <div class="text-white text-3xl mb-2">🎵</div>
-                    <h3 class="text-white font-semibold mb-1">Genre Prediction</h3>
-                    <p class="text-white text-sm opacity-80">Discover the genre of any song</p>
-                </div>
-                
-                <div class="bg-white bg-opacity-20 p-5 rounded-xl animate-scale-in" style="animation-delay: 0.8s">
-                    <div class="text-white text-3xl mb-2">🎧</div>
-                    <h3 class="text-white font-semibold mb-1">Recommendations</h3>
-                    <p class="text-white text-sm opacity-80">Find similar songs you'll love</p>
-                </div>
-                
-                <div class="bg-white bg-opacity-20 p-5 rounded-xl animate-scale-in" style="animation-delay: 1s">
-                    <div class="text-white text-3xl mb-2">🎚️</div>
-                    <h3 class="text-white font-semibold mb-1">Audio Features</h3>
-                    <p class="text-white text-sm opacity-80">Analyze the details of your music</p>
-                </div>
+            <div class="flex space-x-6">
+                <a href="/" class="text-white hover:text-gray-300 transition-colors">Home</a>
+                <a href="/about" class="text-white hover:text-gray-300 transition-colors">About Us</a>
+                <a href="/contact" class="text-white hover:text-gray-300 transition-colors">Contact</a>
+                <a href="/index" class="text-white hover:text-gray-300 transition-colors">Explore</a>
             </div>
-            
-            <!-- Button with animation -->
-            <a href="/index" class="button-shine group relative inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white transition-all duration-300 bg-gradient-to-r from-primary via-secondary to-accent rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary animate-bounce-slow">
-                <span>Get Started</span>
-                <svg class="w-6 h-6 ml-2 -mr-1 transition-transform duration-300 ease-out transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                </svg>
-            </a>
         </div>
-    </div>
+    </nav>
     
+    <!-- Video Background -->
+    <video autoplay muted loop id="bg-video" class="fixed top-0 left-0 w-full h-full object-cover object-center -z-10">
+        <source src="/static/videos/welcome-bg.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Only Transparent Button (lowered, no container) -->
+    <a href="/index" class="z-10 absolute left-1/2 transform -translate-x-1/2 bottom-32 px-8 py-4 text-lg font-bold text-white bg-transparent border-2 border-white rounded-full hover:bg-white hover:bg-opacity-20 transition-all duration-300">
+        Get Started
+    </a>
+    <!-- No music notes animation -->
     <script>
-        // Create floating music notes
-        function createMusicNotes() {
-            const container = document.getElementById('notes-container');
-            const notes = ['♪', '♫', '♩', '♬', '♭', '♮', '♯'];
-            const colors = ['#ffffff', '#ffaf7b', '#d76d77'];
-            
-            for (let i = 0; i < 30; i++) {
-                const note = document.createElement('div');
-                note.className = 'music-note';
-                note.textContent = notes[Math.floor(Math.random() * notes.length)];
-                note.style.left = `${Math.random() * 100}%`;
-                note.style.color = colors[Math.floor(Math.random() * colors.length)];
-                note.style.fontSize = `${Math.random() * 20 + 10}px`;
-                note.style.animationDelay = `${Math.random() * 10}s`;
-                note.style.animationDuration = `${Math.random() * 10 + 10}s`;
-                container.appendChild(note);
-            }
+    // No animation JS needed
+    </script>
+    <div id="music-notes"></div>
+    <script>
+    // Animated floating music notes
+    document.addEventListener('DOMContentLoaded', function() {
+        const notes = ['\u266B', '\u266A', '\u266C', '\u2669', '\u266F'];
+        const colors = ['#E5A68A', '#FCEBD6', '#AA6E72', '#734773', '#3E2B59'];
+        const container = document.getElementById('music-notes');
+        for (let i = 0; i < 18; i++) {
+            const note = document.createElement('span');
+            note.textContent = notes[Math.floor(Math.random() * notes.length)];
+            note.className = 'music-note';
+            note.style.left = Math.random() * 100 + 'vw';
+            note.style.fontSize = (Math.random() * 2 + 1.5) + 'rem';
+            note.style.color = colors[Math.floor(Math.random() * colors.length)];
+            note.style.animationDelay = (Math.random() * 8) + 's';
+            container.appendChild(note);
         }
-        
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            createMusicNotes();
-        });
+    });
     </script>
 </body>
 </html>

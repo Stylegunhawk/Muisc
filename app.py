@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, send_from_directory, jsonify
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory, jsonify, flash
 import os
 from werkzeug.utils import secure_filename
 import subprocess
@@ -11,6 +11,7 @@ from recommend import recommend_songs
 UPLOAD_FOLDER = "uploads"
 
 app = Flask(__name__)
+app.secret_key = 'supersecretkey'  # Needed for flashing messages
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 
@@ -18,6 +19,40 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 @app.route("/", methods=["GET"])
 def welcome():
     return render_template("welcome.html")
+
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
+@app.route("/contact", methods=["GET", "POST"])
+def contact():
+    if request.method == "POST":
+        name = request.form.get("name")
+        email = request.form.get("email")
+        message = request.form.get("message")
+        from datetime import datetime
+        import json
+        contact_data = {
+            "name": name,
+            "email": email,
+            "message": message,
+            "timestamp": datetime.now().isoformat()
+        }
+        contacts_file = os.path.join(os.path.dirname(__file__), 'contacts.json')
+        if os.path.exists(contacts_file):
+            with open(contacts_file, 'r', encoding='utf-8') as f:
+                try:
+                    contacts = json.load(f)
+                except json.JSONDecodeError:
+                    contacts = []
+        else:
+            contacts = []
+        contacts.append(contact_data)
+        with open(contacts_file, 'w', encoding='utf-8') as f:
+            json.dump(contacts, f, indent=2, ensure_ascii=False)
+        flash("Thank you for reaching out! We'll get back to you soon.", "success")
+        return redirect(url_for("contact"))
+    return render_template("contact.html")
 
 # Home page – handles analyze requests
 @app.route("/index", methods=["GET", "POST"])
@@ -56,11 +91,25 @@ def index():
             predicted_genre, prediction = predict_genre(audio_input)
             recommendations = recommend_songs(predicted_genre, audio_features)
 
+            # Load genre facts and pick a random one for the predicted genre
+            genre_facts_path = os.path.join(os.path.dirname(__file__), 'genre_facts.json')
+            genre_fact = None
+            try:
+                with open(genre_facts_path, 'r', encoding='utf-8') as f:
+                    all_facts = json.load(f)
+                    facts_list = all_facts.get(predicted_genre, [])
+                    if facts_list:
+                        import random
+                        genre_fact = random.choice(facts_list)
+            except Exception as e:
+                genre_fact = None
+
             return render_template("result.html",
                                    genre=predicted_genre,
                                    confidence=prediction,
                                    features=audio_features,
-                                   recommendations=recommendations)
+                                   recommendations=recommendations,
+                                   genre_fact=genre_fact)
 
     return render_template("index.html", song_files=sorted_song_files)
 

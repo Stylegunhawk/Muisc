@@ -9,6 +9,7 @@ A web application that predicts music genres, extracts audio features, and recom
 - **Song Recommendations**: Suggests similar songs based on genre and audio features
 - **YouTube Integration**: Downloads songs directly from YouTube for analysis
 - **Audio Playback**: Built-in player for uploaded/downloaded songs
+- **Genre Fun Facts**: Displays a random fun fact, tip, and icon for each predicted genre
 
 ## 🧠 Machine Learning Model
 
@@ -48,9 +49,11 @@ MusicRecommender/
 │   ├── index.html         # Main page with player and song list
 │   └── result.html        # Results page with predictions
 ├── uploads/               # Uploaded and downloaded audio files
-└── utils/                 # Helper functions
-    ├── file_utils.py      # File handling utilities
-    └── model_utils.py     # Model prediction utilities
+├── utils/                 # Helper functions
+│   ├── file_utils.py      # File handling utilities
+│   └── model_utils.py     # Model prediction utilities
+├── genre_facts.json        # Fun facts, tips, and icons for each genre
+└── ...
 ```
 
 ## 🚀 Getting Started
@@ -112,6 +115,41 @@ MusicRecommender/
 - Displays predicted genre with confidence scores
 - Shows extracted audio features
 - Lists song recommendations based on genre and features
+- Displays a random fun fact, tip, and icon for the predicted genre
+
+## 🎤 Genre Fun Facts
+
+- The results page now displays a random fun fact, tip, and icon for each predicted genre, loaded from a dedicated `genre_facts.json` file.
+- Each genre has at least 10 unique facts/tips, making the results more engaging and educational.
+- The backend randomly selects a fact for the predicted genre and passes it to the UI.
+
+### Customizing Genre Facts
+
+- To add or edit facts, tips, or icons for any genre, open `genre_facts.json` and add entries to the relevant genre’s list.
+- Each entry is an object with:
+  - `icon`: an emoji or icon string
+  - `desc`: a short genre description
+  - `fact`: an interesting fact or trivia
+  - `tip`: a listening or engagement tip
+
+**Example Entry:**
+```json
+"Jazz": [
+  {
+    "icon": "🎷",
+    "desc": "Improvisational, expressive, and smooth with rich harmonies.",
+    "fact": "Jazz originated in New Orleans in the early 20th century.",
+    "tip": "Great for relaxing evenings."
+  }
+]
+```
+
+## 🖌️ Modern UI Enhancements
+- Animated confidence bars, genre icons, and a visually engaging, rhythm-inspired layout.
+- Responsive design for desktop and mobile.
+
+## 🛣️ Ready for React (Optional)
+- The backend is API-ready and can be connected to a React frontend in the future for even more interactivity and scalability.
 
 ## 🧩 How It Works
 
