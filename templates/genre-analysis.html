@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Genre Analysis - Urban Beatzs</title>
+    <link rel="icon" type="image/png" href="/static/images/favicon.ico">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .feature-page {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 80px auto 0;
+        }
+
+        .feature-hero {
+            background: linear-gradient(135deg, rgba(58,28,113,0.95), rgba(170,110,114,0.95));
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .genre-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .genre-card {
+            background: rgba(252,235,214,0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .genre-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .genre-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #3E2B59;
+        }
+
+        .genre-name {
+            font-family: 'Amatic SC', cursive, sans-serif;
+            font-size: 1.8rem;
+            color: #3E2B59;
+            margin-bottom: 0.5rem;
+        }
+
+        .tech-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .tech-title {
+            font-family: 'Amatic SC', cursive, sans-serif;
+            font-size: 2.5rem;
+            color: #3E2B59;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .tech-item {
+            background: #FCEBD6;
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .tech-stat {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #AA6E72;
+            margin-bottom: 0.5rem;
+        }
+
+        .tech-label {
+            color: #734773;
+            font-size: 0.9rem;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #3E2B59;
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <div class="feature-page">
+        <div class="feature-hero">
+            <h1 style="font-family: 'Amatic SC', cursive, sans-serif; font-size: 3rem; margin-bottom: 1rem;">Genre Analysis</h1>
+            <p>Our system uses advanced deep learning to classify music into 10 distinct genres. Learn about our technology and how it works.</p>
+        </div>
+
+        <div class="genre-grid">
+            <div class="genre-card">
+                <div class="genre-icon"><i class="fas fa-guitar"></i></div>
+                <div class="genre-name">Blues</div>
+            </div>
+            <div class="genre-card">
+                <div class="genre-icon"><i class="fas fa-violin"></i></div>
+                <div class="genre-name">Classical</div>
+            </div>
+            <div class="genre-card">
+                <div class="genre-icon"><i class="fas fa-hat-cowboy"></i></div>
+                <div class="genre-name">Country</div>
+            </div>
+            <div class="genre-card">
+                <div class="genre-icon"><i class="fas fa-compact-disc"></i></div>
+                <div class="genre-name">Disco</div>
+            </div>
+            <div class="genre-card">
+                <div class="genre-icon"><i class="fas fa-microphone"></i></div>
+                <div class="genre-name">Hip-Hop</div>
+            </div>
+            <div class="genre-card">
+                <div class="genre-icon"><i class="fas fa-saxophone"></i></div>
+                <div class="genre-name">Jazz</div>
+            </div>
+            <div class="genre-card">
+                <div class="genre-icon"><i class="fas fa-drum"></i></div>
+                <div class="genre-name">Metal</div>
+            </div>
+            <div class="genre-card">
+                <div class="genre-icon"><i class="fas fa-music"></i></div>
+                <div class="genre-name">Pop</div>
+            </div>
+            <div class="genre-card">
+                <div class="genre-icon"><i class="fas fa-record-vinyl"></i></div>
+                <div class="genre-name">Reggae</div>
+            </div>
+            <div class="genre-card">
+                <div class="genre-icon"><i class="fas fa-bolt"></i></div>
+                <div class="genre-name">Rock</div>
+            </div>
+        </div>
+
+        <div class="tech-section">
+            <h2 class="tech-title">
+                <i class="fas fa-brain"></i>
+                Model Architecture
+            </h2>
+            <p>We use a Convolutional Neural Network (CNN) trained on the GTZAN dataset. Our model processes mel-spectrograms - visual representations of audio that capture frequency and time information.</p>
+            
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <div class="tech-stat">95%</div>
+                    <div class="tech-label">Training Accuracy</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-stat">89%</div>
+                    <div class="tech-label">Validation Accuracy</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-stat">1,000</div>
+                    <div class="tech-label">Training Tracks</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-stat">30s</div>
+                    <div class="tech-label">Audio Analysis Length</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tech-section">
+            <h2 class="tech-title">
+                <i class="fas fa-code"></i>
+                Technical Implementation
+            </h2>
+            <ul style="list-style: none; padding: 0;">
+                <li style="margin-bottom: 1rem;">
+                    <strong>Framework:</strong> TensorFlow/Keras
+                </li>
+                <li style="margin-bottom: 1rem;">
+                    <strong>Loss Function:</strong> Categorical Crossentropy
+                </li>
+                <li style="margin-bottom: 1rem;">
+                    <strong>Optimizer:</strong> Adam
+                </li>
+                <li>
+                    <strong>Input Format:</strong> Mel-spectrogram images (converted from 30-second audio clips)
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='navbar.js') }}"></script>
+</body>
+</html>

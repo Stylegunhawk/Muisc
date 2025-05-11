@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Audio Features - Urban Beatzs</title>
+    <link rel="icon" type="image/png" href="/static/images/favicon.ico">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .feature-page {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 80px auto 0;
+        }
+
+        .feature-hero {
+            background: linear-gradient(135deg, rgba(58,28,113,0.95), rgba(170,110,114,0.95));
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: #3E2B59;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-family: 'Amatic SC', cursive, sans-serif;
+            font-size: 2rem;
+            color: #3E2B59;
+            margin-bottom: 1rem;
+        }
+
+        .feature-description {
+            color: #734773;
+            line-height: 1.6;
+        }
+
+        .meter-container {
+            background: #FCEBD6;
+            border-radius: 10px;
+            height: 8px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3E2B59, #AA6E72);
+            width: 0;
+            transition: width 1s ease;
+        }
+
+        .tech-info {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .tech-title {
+            font-family: 'Amatic SC', cursive, sans-serif;
+            font-size: 2.5rem;
+            color: #3E2B59;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #3E2B59;
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <div class="feature-page">
+        <div class="feature-hero">
+            <h1 style="font-family: 'Amatic SC', cursive, sans-serif; font-size: 3rem; margin-bottom: 1rem;">Audio Features Analysis</h1>
+            <p>Discover how we analyze various aspects of music to provide accurate genre classification and personalized recommendations.</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-music"></i></div>
+                <h3 class="feature-title">Danceability</h3>
+                <p class="feature-description">How suitable a track is for dancing based on tempo, rhythm stability, and beat strength.</p>
+                <div class="meter-container">
+                    <div class="meter-fill" style="width: 85%;"></div>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                <h3 class="feature-title">Energy</h3>
+                <p class="feature-description">Represents the intensity and activity. High energy tracks are typically loud and fast.</p>
+                <div class="meter-container">
+                    <div class="meter-fill" style="width: 75%;"></div>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-clock"></i></div>
+                <h3 class="feature-title">Tempo</h3>
+                <p class="feature-description">The speed of the track measured in beats per minute (BPM), indicating the pace of the music.</p>
+                <div class="meter-container">
+                    <div class="meter-fill" style="width: 90%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tech-info">
+            <h2 class="tech-title">
+                <i class="fas fa-code"></i>
+                Technical Details
+            </h2>
+            <p style="color: #734773; line-height: 1.6; margin-bottom: 1.5rem;">
+                We use the Spotify Web API to extract detailed audio features from tracks. These features are then processed by our machine learning model to enhance genre classification accuracy and generate personalized recommendations.
+            </p>
+            <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px;">
+                <h3 style="color: #3E2B59; margin-bottom: 1rem;">Feature Extraction Process:</h3>
+                <ol style="color: #734773; line-height: 1.6;">
+                    <li>Audio file is analyzed for temporal and spectral characteristics</li>
+                    <li>Features are normalized to ensure consistent scaling</li>
+                    <li>Data is processed through our CNN model</li>
+                    <li>Results are combined with existing music metadata</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Animate meters on scroll
+        const observers = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.width = entry.target.dataset.value;
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.meter-fill').forEach(meter => {
+            observers.observe(meter);
+        });
+    </script>
+    <script src="{{ url_for('static', filename='navbar.js') }}"></script>
+</body>
+</html>
