@@ -197,3 +197,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [TensorFlow](https://www.tensorflow.org/) for machine learning
 - [Flask](https://flask.palletsprojects.com/) for web framework
 - [yt-dlp](https://github.com/yt-dlp/yt-dlp) for YouTube downloads
+
+- Disclaimer: This project was developed independently by the authors as a part of an academic course project. No institutional resources were used, and no intellectual property agreement was signed with the university. The authors retain full ownership under the MIT License.
+
+- © 2025 Urban Beatzs Project Authors. All rights reserved.
